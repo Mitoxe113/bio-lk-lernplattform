@@ -55,22 +55,27 @@
   const figs = {};
   Object.keys(F).forEach(id => { const f = F[id]; figs[id] = { id, page: f[0], label: f[1], caption: f[2], box: f[3] }; });
 
-  /* ---------- Speicherung der PDF (IndexedDB) ---------- */
-  const DB = 'bioLK-book', STORE = 'files';
+  /* ---------- Speicherung der PDF (IndexedDB) ----------
+     Die PDF wird in Stücken zu 4 MB gespeichert. Ein einzelner 290-MB-Blob
+     scheitert in Safari (iPad/iPhone) oft, weil die gewählte Datei dort nur
+     vorübergehend lesbar ist und große Einzeleinträge abgelehnt werden. */
+  const DB = 'bioLK-book', STORE = 'files', CHUNK = 4 * 1024 * 1024;
   function idb() {
     return new Promise((res, rej) => {
-      if (!window.indexedDB) return rej(new Error('IndexedDB nicht verfügbar'));
+      if (!window.indexedDB) return rej(Object.assign(new Error('IndexedDB nicht verfügbar'), { name: 'NoStorage' }));
       const r = indexedDB.open(DB, 1);
       r.onupgradeneeded = () => r.result.createObjectStore(STORE);
       r.onsuccess = () => res(r.result);
       r.onerror = () => rej(r.error);
     });
   }
-  async function dbGet(key) { const db = await idb(); return new Promise((res, rej) => { const q = db.transaction(STORE).objectStore(STORE).get(key); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
-  async function dbPut(key, val) { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction(STORE, 'readwrite'); tx.objectStore(STORE).put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
-  async function dbDel(key) { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction(STORE, 'readwrite'); tx.objectStore(STORE).delete(key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+  let dbP = null;
+  const db = () => (dbP = dbP || idb().catch(e => { dbP = null; throw e; }));
+  async function dbGet(key) { const d = await db(); return new Promise((res, rej) => { const q = d.transaction(STORE).objectStore(STORE).get(key); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+  async function dbPut(key, val) { const d = await db(); return new Promise((res, rej) => { const tx = d.transaction(STORE, 'readwrite'); tx.objectStore(STORE).put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error || new Error('Speichern abgebrochen')); }); }
+  async function dbClear() { const d = await db(); return new Promise((res, rej) => { const tx = d.transaction(STORE, 'readwrite'); tx.objectStore(STORE).clear(); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
 
-  /* ---------- pdf.js laden (lokal, kein CDN) ---------- */
+  /* ---------- pdf.js laden (lokal, kein CDN; Legacy-Build für ältere Safari-Versionen) ---------- */
   let libP = null, docP = null, info = null;
   function lib() {
     if (!libP) {
@@ -78,38 +83,85 @@
       libP = import(new URL('vendor/pdfjs/pdf.min.js', base).href).then(m => {
         m.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.min.js', base).href;
         return m;
-      });
+      }).catch(e => { libP = null; throw e; });
     }
     return libP;
   }
-  // Datei stückweise lesen, damit die große PDF nicht komplett in den Speicher muss
-  async function openBlob(blob) {
+  // Lesequellen: direkt aus einer Datei bzw. einem Blob oder aus den gespeicherten Stücken
+  const blobReader = (blob) => async (b, e) => new Uint8Array(await blob.slice(b, e).arrayBuffer());
+  function chunkReader(rec) {
+    const cache = new Map();
+    const get = async (i) => {
+      if (cache.has(i)) return cache.get(i);
+      const buf = await dbGet('book:' + i);
+      if (!buf) throw new Error('Gespeichertes Buch ist unvollständig. Bitte erneut verknüpfen.');
+      const u = new Uint8Array(buf);
+      cache.set(i, u); if (cache.size > 12) cache.delete(cache.keys().next().value);
+      return u;
+    };
+    return async (b, e) => {
+      e = Math.min(e, rec.size);
+      const out = new Uint8Array(Math.max(0, e - b));
+      for (let i = Math.floor(b / rec.chunk); i * rec.chunk < e; i++) {
+        const c = await get(i), cs = i * rec.chunk;
+        const from = Math.max(b, cs), to = Math.min(e, cs + c.length);
+        out.set(c.subarray(from - cs, to - cs), from - b);
+      }
+      return out;
+    };
+  }
+  // PDF stückweise öffnen, damit die große Datei nie komplett im Speicher liegt
+  async function openSource(size, read) {
     const pdfjs = await lib();
-    const first = new Uint8Array(await blob.slice(0, Math.min(blob.size, 1 << 20)).arrayBuffer());
-    const tr = new pdfjs.PDFDataRangeTransport(blob.size, first);
-    tr.requestDataRange = (b, e) => { blob.slice(b, e).arrayBuffer().then(buf => tr.onDataRange(b, new Uint8Array(buf))); };
-    return pdfjs.getDocument({ range: tr, length: blob.size, disableAutoFetch: true, disableStream: true, isEvalSupported: false }).promise;
+    const first = await read(0, Math.min(size, 1 << 20));
+    const tr = new pdfjs.PDFDataRangeTransport(size, first);
+    tr.requestDataRange = (b, e) => { read(b, e).then(u => tr.onDataRange(b, u)).catch(err => console.warn('Lesefehler', err)); };
+    return pdfjs.getDocument({ range: tr, length: size, disableAutoFetch: true, disableStream: true, isEvalSupported: false }).promise;
   }
   function getDoc() {
     if (!docP) {
       docP = dbGet('book').then(rec => {
-        if (!rec || !rec.blob) return null;
-        info = { name: rec.name, size: rec.blob.size, pages: rec.pages, ts: rec.ts };
-        return openBlob(rec.blob);
+        if (!rec) return null;
+        if (rec.blob) { info = { name: rec.name, size: rec.blob.size, pages: rec.pages, ts: rec.ts }; return openSource(rec.blob.size, blobReader(rec.blob)); }
+        info = { name: rec.name, size: rec.size, pages: rec.pages, ts: rec.ts };
+        return openSource(rec.size, chunkReader(rec));
       }).catch(e => { console.warn('Buch konnte nicht geöffnet werden:', e); return null; });
     }
     return docP;
   }
-  async function link(file) {
-    const doc = await openBlob(file);
+  async function link(file, onProgress) {
+    // 1. Ist es überhaupt eine lesbare PDF?
+    let doc;
+    try { doc = await openSource(file.size, blobReader(file)); }
+    catch (e) { throw Object.assign(new Error(e && e.message || 'PDF nicht lesbar'), { name: 'PdfError' }); }
     const pages = doc.numPages;
-    await dbPut('book', { blob: file, name: file.name, pages, ts: Date.now() });
-    info = { name: file.name, size: file.size, pages, ts: Date.now() };
-    docP = Promise.resolve(doc);
+    doc.destroy();
+    // 2. Reicht der Speicher?
+    try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) { /* optional */ }
+    try {
+      if (navigator.storage && navigator.storage.estimate) {
+        const est = await navigator.storage.estimate();
+        if (est.quota && est.quota - (est.usage || 0) < file.size * 1.05) throw Object.assign(new Error('zu wenig Speicher'), { name: 'QuotaExceededError', need: file.size, free: est.quota - (est.usage || 0) });
+      }
+    } catch (e) { if (e.name === 'QuotaExceededError') throw e; }
+    // 3. In Stücken speichern
+    const n = Math.ceil(file.size / CHUNK);
+    const rec = { v: 2, name: file.name, size: file.size, chunk: CHUNK, n, pages, ts: Date.now() };
+    try {
+      await dbClear();
+      for (let i = 0; i < n; i++) {
+        const buf = await file.slice(i * CHUNK, Math.min(file.size, (i + 1) * CHUNK)).arrayBuffer();
+        await dbPut('book:' + i, buf);
+        if (onProgress) onProgress((i + 1) / n);
+      }
+      await dbPut('book', rec);
+    } catch (e) { e = e || new Error('Speichern fehlgeschlagen'); try { e.stage = 'store'; } catch (x) { /* readonly */ } throw e; }
+    info = { name: rec.name, size: rec.size, pages, ts: rec.ts };
+    docP = openSource(rec.size, chunkReader(rec));
     pageCache.clear();
     return { pages, ok: pages === EXPECTED_PAGES };
   }
-  async function unlink() { await dbDel('book'); docP = Promise.resolve(null); info = null; pageCache.clear(); }
+  async function unlink() { await dbClear(); docP = Promise.resolve(null); info = null; pageCache.clear(); }
   async function status() { const d = await getDoc(); return d ? Object.assign({ linked: true, ok: d.numPages === EXPECTED_PAGES }, info) : { linked: false }; }
 
   /* ---------- Ausschnitt rendern ---------- */
@@ -215,19 +267,39 @@
     });
   }
 
-  // Dateiauswahl (von überall per [data-booklink])
+  // Dateiauswahl (von überall per [data-booklink]).
+  // Das Eingabefeld hängt im Dokument, sonst feuert Safari auf iPad/iPhone kein change-Ereignis.
+  let busy = false;
   function pick() {
+    if (busy) return;
     const inp = document.createElement('input');
     inp.type = 'file'; inp.accept = 'application/pdf,.pdf';
+    inp.style.cssText = 'position:fixed;left:-9999px;opacity:0;width:1px;height:1px';
+    document.body.appendChild(inp);
     inp.addEventListener('change', async () => {
-      const file = inp.files[0]; if (!file) return;
-      BIO.toast('Buch wird geöffnet …', 4000);
+      const file = inp.files && inp.files[0];
+      inp.remove();
+      if (!file) return;
+      busy = true;
+      BIO.toast('Buch wird geprüft …', 60000);
+      let last = -1;
       try {
-        const r = await link(file);
+        const r = await link(file, f => { const pc = Math.floor(f * 100); if (pc !== last && pc % 5 === 0) { last = pc; BIO.toast(`Buch wird gespeichert … ${pc} %`, 60000); } });
         BIO.toast(r.ok ? 'Buch verknüpft.' : `Verknüpft, aber die PDF hat ${r.pages} statt ${EXPECTED_PAGES} Seiten. Abbildungen können verschoben sein.`, 5000);
         window.dispatchEvent(new HashChangeEvent('hashchange'));
-      } catch (e) { BIO.toast('Die Datei konnte nicht als PDF gelesen werden.', 4000); console.warn(e); }
-    });
+      } catch (e) {
+        console.warn(e);
+        const mb = (x) => Math.round(x / 1048576);
+        let msg;
+        if (e.name === 'PdfError') msg = 'Die Datei konnte nicht als PDF gelesen werden.';
+        else if (e.name === 'QuotaExceededError') msg = `Nicht genug Speicher im Browser für das Buch (${mb(file.size)} MB nötig${e.free != null ? `, frei: ${mb(Math.max(0, e.free))} MB` : ''}). Auf dem iPad: Speicherplatz freigeben, keinen privaten Tab nutzen.`;
+        else if (e.name === 'NoStorage') msg = 'Dieser Browser erlaubt kein lokales Speichern (privater Modus?).';
+        else msg = `Speichern fehlgeschlagen: ${e.name || ''} ${e.message || ''}`.trim();
+        BIO.toast(msg, 9000);
+        // nur halb gespeicherte Daten entfernen; ein vorher verknüpftes Buch bleibt bei Prüf-Fehlern erhalten
+        if (e.stage === 'store') { try { await dbClear(); docP = Promise.resolve(null); } catch (x) { /* egal */ } }
+      } finally { busy = false; }
+    }, { once: true });
     inp.click();
   }
   document.addEventListener('click', e => {

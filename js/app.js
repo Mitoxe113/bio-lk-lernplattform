@@ -62,11 +62,6 @@
   }
 
   /* ======================= Lernzettel ======================= */
-  const SECTIONS = [
-    ['grundlagen', 'Grundlagen'], ['erklaerung', 'Ausführliche Erklärung'], ['begriffe', 'Wichtige Fachbegriffe'],
-    ['mechanismen', 'Mechanismen und Abläufe'], ['zusammenhaenge', 'Zusammenhänge'], ['abbildungen', 'Abbildungen und Modelle'],
-    ['klausur', 'Klausurrelevantes Wissen'], ['fehler', 'Typische Fehler'], ['zusammenfassung', 'Zusammenfassung'], ['selbstkontrolle', 'Selbstkontrolle']
-  ];
   function sheetOverview(main) {
     const st = store.state;
     main.innerHTML = `<div class="page-head"><h1>Lernzettel</h1><p>Die 10 Themen entsprechen der Checkliste. Grundlage ist das Buch (Natura Kursstufe, S. 12–41) mit Seitenangaben. Was nicht im Buch steht, ist als Ergänzung gekennzeichnet.</p></div>
@@ -76,35 +71,22 @@
   function sheet(main, tid) {
     const t = BIO.topicById[tid];
     if (!t) return sheetOverview(main);
-    const s = t.sheet, st = store.state;
+    const st = store.state;
     const idx = BIO.topics.indexOf(t), prev = BIO.topics[idx - 1], next = BIO.topics[idx + 1];
-    const content = {
-      grundlagen: `<div class="prose">${s.intro}</div>`,
-      erklaerung: `<div class="prose">${s.explain}</div>`,
-      begriffe: `<div class="table-wrap"><table class="data term-table"><thead><tr><th>Begriff</th><th>Bedeutung</th></tr></thead><tbody>${s.termdefs.map(d => `<tr><th scope="row">${d[0]}</th><td>${d[1]}</td></tr>`).join('')}</tbody></table></div>
-        <p class="small muted">Begriffe der Checkliste: ${t.terms.map(x => `<a href="#/lexikon?q=${encodeURIComponent(x)}">${esc(x)}</a>`).join(' · ')}</p>`,
-      mechanismen: `<div class="prose">${s.mechanism}</div>`,
-      zusammenhaenge: `<div class="prose">${s.connections}</div>`,
-      abbildungen: `<p>Abbildungen aus dem Buch in diesem Lernzettel:</p><ul class="fig-index">${(BIO.book.topicFigs[t.id] || []).map(id => { const f = BIO.book.figs[id]; return `<li><a href="#" data-jump="${id}">${esc(f.caption)}</a> <span class="muted small">${BIO.book.ref(f)}</span></li>`; }).join('')}</ul>
-        <h3>Interaktive Modelle</h3><p class="muted small">Eigene vereinfachte Darstellungen zum Ausprobieren.</p>${s.figures.map(f => `<div data-figure="${f[0]}" data-caption="${esc(f[1])}"></div>`).join('')}`,
-      klausur: `<div class="box exam"><div class="box-title">Für die Klausur</div><ul>${s.exam.map(x => `<li>${x}</li>`).join('')}</ul></div>`,
-      fehler: `<ul class="err-list">${s.errors.map(e => `<li><div class="wrong">✗ ${e[0]}</div><div class="right">✓ ${e[1]}</div></li>`).join('')}</ul>`,
-      zusammenfassung: `<ul>${s.summary.map(x => `<li>${x}</li>`).join('')}</ul>`,
-      selbstkontrolle: `${s.selfcheck.map((q, i) => `<details class="selfcheck"><summary>${i + 1}. ${q[0]}</summary><div>${q[1]}</div></details>`).join('')}
-        <div class="row mt"><a class="btn primary" href="#/uebungen/quiz?topic=${t.id}">Quiz zu Thema ${t.nr}</a><a class="btn" href="#/uebungen/karten?topic=${t.id}&mode=alle">Karteikarten</a><a class="btn" href="#/uebungen/offen?topic=${t.id}">Offene Fragen</a></div>`
-    };
+    const labs = (t.labs || []).filter(k => BIO.labs && BIO.labs[k]);
     main.innerHTML = `<div class="crumbs"><a href="#/lernzettel">Lernzettel</a> › Thema ${t.nr}</div>
-      <div class="page-head"><div class="row"><span class="topic-num">${t.nr}</span><h1 class="mb0">${esc(t.title)}</h1></div><p>${esc(t.short)} · <span class="page-ref">Buch S. ${t.pages}</span></p>
+      <div class="page-head"><h1 class="ntitle"><span class="mk y">Thema ${t.nr} · ${esc(t.title)}</span></h1><p>Buch S. ${t.pages}</p>
         <div class="row"><span class="small muted">Thema:</span>${statusGroup('topic', t.id, st.topicStatus[t.id])}<span class="spacer"></span><button class="btn small ${st.read[t.id] ? 'ok' : ''}" data-a="read">${st.read[t.id] ? 'gelesen' : 'Als gelesen markieren'}</button><button class="btn small ghost" data-a="print">Drucken</button></div></div>
-      <div class="card"><h2 style="margin-top:0">Lernziele</h2><ul class="goal-list">${t.goals.map(g => `<li><span>${esc(g.text)}</span>${statusGroup('goal', g.id, st.goals[g.id])}</li>`).join('')}</ul></div>
-      <div class="sheet-layout"><article class="sheet">${SECTIONS.map((sec, i) => `<section class="card" id="sec-${sec[0]}"><h2><span class="sec-num">${i + 1}</span>${sec[1]}</h2>${content[sec[0]]}</section>`).join('')}</article>
-        <nav class="toc card" aria-label="Inhalt">${SECTIONS.map((sec, i) => `<a href="#sec-${sec[0]}" data-sec="${sec[0]}">${i + 1}. ${sec[1]}</a>`).join('')}</nav></div>
+      <details class="card goals"><summary><h2>Lernziele laut Checkliste (${t.goals.length})</h2></summary><ul class="goal-list">${t.goals.map(g => `<li><span>${esc(g.text)}</span>${statusGroup('goal', g.id, st.goals[g.id])}</li>`).join('')}</ul></details>
+      <article class="card notes">${t.notes}</article>
+      <section class="card"><h2>Für die Klausur</h2><ul>${t.exam.map(x => `<li>${x}</li>`).join('')}</ul>
+        ${t.draw ? `<h3>So zeichnest du es</h3><ol class="nsteps">${t.draw.map(x => `<li>${x}</li>`).join('')}</ol>` : ''}</section>
+      <section class="card"><h2>Fehler und Korrekturen</h2><ul class="err-list">${t.errors.map(e => `<li>${e[2] ? '<span class="chip warn">dein Aufschrieb</span>' : ''}<div class="wrong">✗ ${e[0]}</div><div class="right">✓ ${e[1]}</div></li>`).join('')}</ul></section>
+      <section class="card"><h2>Selbstkontrolle</h2>${t.selfcheck.map((q, i) => `<details class="selfcheck"><summary>${i + 1}. ${q[0]}</summary><div>${q[1]}</div></details>`).join('')}
+        <div class="row mt"><a class="btn primary" href="#/uebungen/quiz?topic=${t.id}">Quiz zu Thema ${t.nr}</a><a class="btn" href="#/uebungen/karten?topic=${t.id}&mode=alle">Karteikarten</a><a class="btn" href="#/uebungen/offen?topic=${t.id}">Offene Fragen</a></div>
+        ${labs.length ? `<p class="small muted mt">Zum Ausprobieren im Bio-Labor: ${labs.map(k => `<a href="#/labor/${k}">${esc(BIO.labs[k].title)}</a>`).join(' · ')}</p>` : ''}</section>
       <div class="row mt">${prev ? `<a class="btn" href="#/lernzettel/${prev.id}">← Thema ${prev.nr}</a>` : ''}<span class="spacer"></span>${next ? `<a class="btn primary" href="#/lernzettel/${next.id}">Thema ${next.nr}: ${esc(next.title)} →</a>` : '<a class="btn primary" href="#/klausur">Zum Klausurmodus →</a>'}</div>`;
-    BIO.mountFigures(main);
     BIO.book.mount(main);
-    $$('[data-jump]', main).forEach(a => a.addEventListener('click', e => { e.preventDefault(); const el = main.querySelector(`.bookfig[data-id="${a.dataset.jump}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }));
-    // TOC-Links dürfen den Hash-Router nicht auslösen
-    $$('.toc a', main).forEach(a => a.addEventListener('click', e => { e.preventDefault(); const el = document.getElementById('sec-' + a.dataset.sec); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
     $('[data-a=read]', main).addEventListener('click', e => { store.markRead(t.id); e.target.textContent = 'gelesen'; e.target.classList.add('ok'); toast('Als gelesen markiert'); });
     $('[data-a=print]', main).addEventListener('click', () => { $$('details', main).forEach(d => d.open = true); window.print(); });
   }

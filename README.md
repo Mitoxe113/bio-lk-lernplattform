@@ -34,14 +34,14 @@ Gut zu wissen:
 - Das Verknüpfen ist **pro Gerät und Browser** einmal nötig. Auf dem Handy muss die PDF also auf dem Handy liegen.
 - Die Seiten werden direkt aus der Datei gelesen, die PDF wird dafür nicht komplett in den Speicher geladen.
 - Lokal funktioniert das nur über `http://localhost:8000`, nicht per Doppelklick (`file://`).
-- Ohne verknüpftes Buch erscheint an der Stelle ein Platzhalter mit Seitenangabe.
+- Ohne verknüpftes Buch erscheinen an diesen Stellen die eigenen Zeichnungen bzw. interaktiven Modelle. Wo es keine eigene Zeichnung gibt, bleibt die Stelle leer; die Seitenangabe steht im Text.
 
 ## Inhalte
 
 | Bereich | Inhalt |
 |---|---|
 | **Übersicht** | Fortschritt gesamt und pro Thema, Quiz-Statistik, offene Fehler, fällige Karteikarten, offene Lernziele |
-| **Lernzettel** | 10 Themen mit je 10 Abschnitten: Grundlagen, Erklärung, Fachbegriffe, Mechanismen, Zusammenhänge, Abbildungen, Klausurwissen, typische Fehler, Zusammenfassung, Selbstkontrolle. Jedes Lernziel lässt sich als gelernt, unsicher oder offen markieren. |
+| **Lernzettel** | 10 Themen, aufgebaut wie die Unterrichtsaufschriebe: Begriff links, Erklärung rechts, Abbildungen mit Notizen daneben, Übersichten als Baum oder Vergleich. Darunter: Für die Klausur, Fehler und Korrekturen (auch zu den eigenen Aufschrieben), Selbstkontrolle. Jedes Lernziel lässt sich als gelernt, unsicher oder offen markieren. |
 | **Übungen** | 83 Multiple-Choice-Fragen, 77 Karteikarten (Leitner-System), Lückentexte, Zuordnung, Reihenfolge, Beschriften, 24 offene Klausurfragen mit Musterlösung und Selbstbewertung, Fehlerliste, Mischtraining |
 | **Bio-Labor** | 14 interaktive Modelle: Aminosäure, Peptidbindung, Proteinstruktur, Phospholipide, Biomembran, Transport, Glucose-Resorption, Endo- und Exozytose, Katalyse, Schlüssel-Schloss/Induced Fit, Michaelis-Menten, Temperatur/pH, Hemmung |
 | **Diagramm-Trainer** | Substratkonzentration, Temperatur, pH und Hemmung: Achsen beschriften, Kurven zeichnen, Punkte markieren, Kurven vergleichen, Verläufe erklären |
@@ -51,7 +51,7 @@ Gut zu wissen:
 ### Herkunft der Inhalte
 
 - **Buch S. …, B…**: steht so im Schulbuch.
-- **Aus dem Unterricht**: aus den eigenen Aufschrieben bzw. Arbeitsblättern.
+- **Unterricht**: aus den eigenen Aufschrieben bzw. Arbeitsblättern.
 - **Ergänzung (steht nicht im Buch)**: zusätzliches Wissen, klar gekennzeichnet und bewusst knapp gehalten.
 - **Hinweis zum Material**: Stellen, an denen Buch, Checkliste und Unterricht nicht zusammenpassen oder etwas fehlt.
 

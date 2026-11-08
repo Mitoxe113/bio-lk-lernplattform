@@ -136,7 +136,7 @@ ${o.bare ? '' : T(276, 280, 'Peptidbindung (rot)', { size: 13, fill: C.red }) + 
 <path d="M250,178 L250,262 L272,290 L272,370" fill="none" stroke="${C.tail}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
 <path d="M140,14 L130,14 L130,182 L140,182" fill="none" stroke="${C.teal}" stroke-width="2.4"/>
 <path d="M140,196 L130,196 L130,376 L140,376" fill="none" stroke="${C.muted}" stroke-width="2.4"/>
-${o.bare ? '' : T(124, 100, 'hydrophiler Kopf', { size: 13, fill: C.teal, anchor: 'end' }) + T(124, 290, 'hydrophobe Schwänze', { size: 13, fill: C.muted, anchor: 'end' }) + T(300, 280, 'Doppelbindung', { size: 12, fill: C.muted, anchor: 'start' }) + T(300, 108, 'Phosphatgruppe', { size: 13, fill: C.orange, anchor: 'start' }) + T(300, 340, 'Fettsäurereste', { size: 13, fill: C.muted, anchor: 'start' })}`;
+${o.bare ? '' : T(124, 100, 'hydrophiler Kopf', { size: 13, fill: C.teal, anchor: 'end' }) + T(128, 290, 'hydrophobe Schwänze', { size: 12, fill: C.muted, anchor: 'end' }) + T(300, 280, 'Doppelbindung', { size: 12, fill: C.muted, anchor: 'start' }) + T(300, 108, 'Phosphatgruppe', { size: 13, fill: C.orange, anchor: 'start' }) + T(300, 340, 'Fettsäurereste', { size: 13, fill: C.muted, anchor: 'start' })}`;
     },
     slots: [
       { key: 'cholin', label: 'Cholin', x: 296, y: 40 },

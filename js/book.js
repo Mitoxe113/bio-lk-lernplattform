@@ -145,8 +145,31 @@
 
   /* ---------- Anzeige ---------- */
   const ref = f => `Buch S. ${f.page}, ${f.label}`;
-  function placeholder(f) {
-    return `<div class="bookfig-empty"><b>${esc(f.caption)}</b><span>${ref(f)}</span><button type="button" class="btn small" data-booklink>Buch verknüpfen, um die Abbildung hier zu sehen</button></div>`;
+  // Ohne verknüpftes Buch: eigene Zeichnung (svg:…) bzw. interaktives Modell (lab:…) an derselben Stelle
+  const FALLBACK = {
+    's12-b3': 'svg:aminoacid', 's12-b4': 'svg:dipeptide', 's13-b6': 'lab:protein', 's13-b7': 'svg:tertiary',
+    's14-b4': 'svg:phospholipid', 's15-b2': 'svg:membrane',
+    's20-b1': 'lab:transport', 's21-b2': 'svg:glucose', 's22-b1': 'svg:endocytosis', 's23-b1': 'lab:exocytosis',
+    's26-b1': 'svg:cycle', 's26-b2': 'svg:energy', 's27-b4': 'lab:catalysis', 's28-b2': 'lab:inducedfit',
+    's33-b3': 'svg:mm', 's32-b1': 'lab:michaelis', 's36-b2': 'svg:tempcurve', 's36-b3': 'lab:tempph',
+    's40-b1': 'svg:inhib', 's40-b2': 'lab:inhibition'
+  };
+  function mountFallback(el, f) {
+    const fb = FALLBACK[f.id];
+    const [kind, key] = fb ? fb.split(':') : [];
+    const ok = kind === 'svg' ? BIO.figures && BIO.figures[key] : kind === 'lab' ? BIO.labs && BIO.labs[key] : false;
+    if (!ok) {   // keine eigene Zeichnung vorhanden: Stelle bleibt leer
+      const row = el.closest('.figrow'); if (row) row.classList.add('nofig');
+      el.remove(); return;
+    }
+    const fig = document.createElement('figure');
+    fig.className = 'bookfig own' + (kind === 'lab' ? ' lab' : '');
+    fig.dataset.id = f.id;
+    fig.innerHTML = `<div class="own-body"></div><figcaption><span>${esc(kind === 'svg' ? BIO.figures[key].title : f.caption)}</span><span class="src">eigene Zeichnung · <button type="button" class="linkbtn" data-booklink title="Buch-PDF verknüpfen">Buchabbildung ${ref(f).replace('Buch ', '')}</button></span></figcaption>`;
+    el.replaceWith(fig);
+    const body = fig.querySelector('.own-body');
+    if (kind === 'svg') body.innerHTML = BIO.models.svgFor(key);
+    else { try { BIO.labs[key].mount(body); } catch (e) { console.error(e); } }
   }
   async function mount(root) {
     const els = Array.from(root.querySelectorAll('[data-bookfig]'));
@@ -155,11 +178,11 @@
     for (const el of els) {
       const f = figs[el.dataset.bookfig];
       if (!f) { el.remove(); continue; }
+      if (!doc) { mountFallback(el, f); continue; }
       const fig = document.createElement('figure');
       fig.className = 'bookfig' + (el.dataset.size === 'small' ? ' small' : '');
       fig.dataset.id = f.id;
-      fig.innerHTML = doc ? `<button type="button" class="bookfig-img" aria-label="${esc(f.caption)} vergrößern"><canvas></canvas></button><figcaption><span>${esc(f.caption)}</span><span class="src">${ref(f)}</span></figcaption>`
-        : `${placeholder(f)}`;
+      fig.innerHTML = `<button type="button" class="bookfig-img" aria-label="${esc(f.caption)} vergrößern"><canvas></canvas></button><figcaption><span>${esc(f.caption)}</span><span class="src">${ref(f)}</span></figcaption>`;
       el.replaceWith(fig);
       if (doc) {
         const cv = fig.querySelector('canvas');

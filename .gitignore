@@ -1,0 +1,5 @@
+.claude/
+*.pdf
+*.docx
+Thumbs.db
+.DS_Store

@@ -84,7 +84,7 @@
     const keys = Object.keys(fig.parts || {});
     const box = document.createElement('div');
     box.className = 'mt';
-    box.innerHTML = `<div class="row"><button type="button" class="btn small navy" data-a="quiz">🎯 Teste dich: Teil finden</button><span class="small muted" data-r="q"></span></div>`;
+    box.innerHTML = `<div class="row"><button type="button" class="btn small navy" data-a="quiz">Teste dich: Teil finden</button><span class="small muted" data-r="q"></span></div>`;
     ui.controls.appendChild(box);
     let target = null, score = 0, tries = 0;
     box.querySelector('[data-a=quiz]').addEventListener('click', () => {
@@ -94,8 +94,8 @@
     return (key) => {
       if (!target) return true;
       tries++;
-      if (key === target) { score++; BIO.toast(`✓ Richtig! (${score}/${tries})`); }
-      else { BIO.toast(`✗ Das war: ${fig.parts[key] ? fig.parts[key][0] : key}`); highlight(svg, [target]); }
+      if (key === target) { score++; BIO.toast(`Richtig (${score}/${tries})`); }
+      else { BIO.toast(`Falsch, das war: ${fig.parts[key] ? fig.parts[key][0] : key}`); highlight(svg, [target]); }
       box.querySelector('[data-r=q]').innerHTML = `Ergebnis: ${score}/${tries} – nochmal auf „Teste dich“ tippen.`;
       target = null;
       return true;
@@ -115,7 +115,7 @@
 
   /* ---- 1 Aminosäure ---- */
   labs.aminoacid = {
-    title: 'α-Aminosäure', topic: 't1', icon: '⬡',
+    title: 'α-Aminosäure', topic: 't1', icon: '',
     desc: 'Grundstruktur einer α-Aminosäure erkunden, Reste vergleichen.',
     mount(el) {
       const { ui, svg } = partsLab(el, 'aminoacid', '<p>Alle 20 Aminosäuren haben dieselbe Grundstruktur – sie unterscheiden sich nur im Rest R.</p>');
@@ -150,7 +150,7 @@
 
   /* ---- 2 Peptidbindung ---- */
   labs.peptide = {
-    title: 'Peptidbindung (Kondensation)', topic: 't1', icon: '⛓',
+    title: 'Peptidbindung (Kondensation)', topic: 't1', icon: '',
     desc: 'Schrittweise: zwei Aminosäuren verknüpfen sich unter Wasserabspaltung.',
     mount(el) {
       const b = (x1, y1, x2, y2, c, w) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c || C.navy}" stroke-width="${w || 2.4}"/>`;
@@ -230,7 +230,7 @@
       ${T(320, 306, 'Hämoglobin: 4 Proteinketten mit je einer Häm-Gruppe (O₂-Bindung)', { size: 13, fill: C.navy2 })}</svg>`;
   }
   labs.protein = {
-    title: 'Strukturebenen der Proteine', topic: 't2', icon: '🧬',
+    title: 'Strukturebenen der Proteine', topic: 't2', icon: '',
     desc: 'Primär-, Sekundär-, Tertiär- und Quartärstruktur mit ihren Bindungen.',
     mount(el) {
       const ui = frame(el, { tabs: ['Primär', 'Sekundär', 'Tertiär', 'Quartär'] });
@@ -262,7 +262,7 @@
 
   /* ---- 4 Phospholipide in Wasser ---- */
   labs.phospholipid = {
-    title: 'Phospholipide in Wasser', topic: 't3', icon: '💧',
+    title: 'Phospholipide in Wasser', topic: 't3', icon: '',
     desc: 'Vom Molekül zum Film, zur Micelle und zur Doppelschicht.',
     mount(el) {
       const ui = frame(el, { tabs: ['Molekül', 'Wasseroberfläche', 'Micelle', 'Doppelschicht'] });
@@ -280,16 +280,16 @@
 
   /* ---- 5 Biomembran ---- */
   labs.membrane = {
-    title: 'Biomembran', topic: 't3', icon: '🧫',
-    desc: 'Flüssig-Mosaik-Modell: alle Bestandteile antippen, Struktur und Funktion lesen.',
+    title: 'Biomembran', topic: 't3', icon: '',
+    desc: 'Modell der Biomembran (Buch S. 15, B2): Bestandteile antippen, Struktur und Funktion lesen.',
     mount(el) {
-      partsLab(el, 'membrane', '<p>Nach dem <b>Flüssig-Mosaik-Modell</b> (Singer & Nicolson 1972) bilden Phospholipide eine flüssige Doppelschicht, in die Proteine mosaikartig eingelagert sind. Das Cytoskelett schränkt die Beweglichkeit ein (Fence-Modell).</p>');
+      partsLab(el, 'membrane', '<p>Phospholipide bilden eine Doppelschicht, in die Proteine eingelagert sind oder an der sie außen anliegen. Auf der Außenseite tragen Lipide und Proteine Kohlenhydratketten (Buch S. 14–15).</p>');
     }
   };
 
   /* ---- 6 Membrantransport: Teilchensimulation ---- */
   labs.transport = {
-    title: 'Membrantransport-Simulation', topic: 't4', icon: '⇄',
+    title: 'Membrantransport-Simulation', topic: 't4', icon: '',
     desc: 'Einfache, kanal- und carriervermittelte Diffusion, primär aktiv, Symport und Antiport live.',
     mount(el) {
       const modes = [
@@ -464,7 +464,7 @@
 
   /* ---- 7 Glucosetransport ---- */
   labs.glucose = {
-    title: 'Glucose: Darm → Blut', topic: 't4', icon: '🍬',
+    title: 'Glucose: Darm → Blut', topic: 't4', icon: '',
     desc: 'Drei Transporter arbeiten zusammen – Schritt für Schritt.',
     mount(el) {
       const fig = BIO.figures.glucose;
@@ -487,7 +487,7 @@
 
   /* ---- 8 Endozytose von Eisen ---- */
   labs.endocytosis = {
-    title: 'Rezeptorvermittelte Endozytose', topic: 't5', icon: '🫧',
+    title: 'Rezeptorvermittelte Endozytose', topic: 't5', icon: '',
     desc: 'Aufnahme von Eisen-Ionen über Transferrin und Rezeptor in 7 Schritten.',
     mount(el) {
       const fig = BIO.figures.endocytosis;
@@ -542,7 +542,7 @@
     </svg>`;
   }
   labs.exocytosis = {
-    title: 'Exozytose & Membranfluss', topic: 't5', icon: '📦',
+    title: 'Exozytose & Membranfluss', topic: 't5', icon: '',
     desc: 'Insulin-Freisetzung (Exozytose) und Insulinwirkung durch Membranfluss.',
     mount(el) {
       const ui = frame(el, { tabs: ['Exozytose: Insulin', 'Membranfluss: Insulinwirkung'] });
@@ -601,7 +601,7 @@
     </svg>`;
   }
   labs.catalysis = {
-    title: 'Enzymkatalyse', topic: 't6', icon: '⚙',
+    title: 'Enzymkatalyse', topic: 't6', icon: '',
     desc: 'Katalytischer Zyklus, Energiediagramm mit/ohne Enzym und Cofaktoren.',
     mount(el) {
       const ui = frame(el, { tabs: ['Katalytischer Zyklus', 'Energiediagramm', 'Cofaktoren'] });
@@ -641,7 +641,7 @@
 
   /* ---- 11 Schlüssel-Schloss / Induced Fit ---- */
   labs.inducedfit = {
-    title: 'Schlüssel-Schloss vs. Induced Fit', topic: 't7', icon: '🔑',
+    title: 'Schlüssel-Schloss vs. Induced Fit', topic: 't7', icon: '',
     desc: 'Substrate testen, Passform beobachten, Spezifität verstehen.',
     mount(el) {
       const ui = frame(el, { tabs: ['Schlüssel-Schloss-Prinzip', 'Induced-Fit-Modell'] });
@@ -716,7 +716,7 @@
     return `<svg viewBox="0 0 580 ${rows * 64 + 10}" class="model">${s}</svg>`;
   }
   labs.michaelis = {
-    title: 'Michaelis-Menten-Kinetik', topic: 't8', icon: '📈',
+    title: 'Michaelis-Menten-Kinetik', topic: 't8', icon: '',
     desc: 'Substratkonzentration, Enzymmenge und Affinität verändern – vmax, ½vmax, KM.',
     mount(el) {
       const ui = frame(el, {});
@@ -757,11 +757,11 @@
 
   /* ---- 13 Temperatur & pH ---- */
   labs.tempph = {
-    title: 'Temperatur & pH-Wert', topic: 't9', icon: '🌡',
+    title: 'Temperatur & pH-Wert', topic: 't9', icon: '',
     desc: 'RGT-Regel, Optimum, Denaturierung – für verschiedene Organismen und Enzyme.',
     mount(el) {
       const ui = frame(el, { tabs: ['Temperatur', 'pH-Wert'] });
-      const orgs = [['Mensch (≈ 37 °C)', 37, 'Viele menschliche Enzyme haben ihr Optimum um 37 °C – Angepasstheit an die Körpertemperatur.'], ['Forelle (≈ 15 °C)', 15, 'Wechselwarmer Fisch: Isoenzym mit niedrigerem Optimum (Buch S. 36, B3).'], ['Eisfisch (≈ 3 °C)', 3, 'Lebt in sehr kaltem Wasser: Enzym mit sehr niedrigem Optimum (Buch S. 36, B3).'], ['thermophiles Bakterium (Modell ≈ 80 °C)', 80, 'Thermophile Enzyme (z. B. Taq-Polymerase, bei 95 °C noch aktiv) sind durch viele Disulfidbrücken und Ionenbindungen stabilisiert. Optimum hier als Modellwert (Ergänzung).']];
+      const orgs = [['Mensch (≈ 37 °C)', 37, 'Viele menschliche Enzyme haben ihr Optimum um 37 °C – Angepasstheit an die Körpertemperatur.'], ['Forelle (≈ 15 °C)', 15, 'Wechselwarmer Fisch: Isoenzym mit niedrigerem Optimum (Buch S. 36, B3).'], ['Eisfisch (≈ 3 °C)', 3, 'Lebt in sehr kaltem Wasser: Enzym mit sehr niedrigem Optimum (Buch S. 36, B3).'], ['thermophiles Bakterium (Modell ≈ 80 °C)', 80, 'Bakterien aus heißen Quellen besitzen Enzyme mit hoher Stabilität, z. B. die Taq-Polymerase aus Thermus aquaticus. Ihre Raumstruktur wird durch viele Disulfidbrücken und Ionenbindungen stabilisiert (Buch S. 36–37). Der Kurvenverlauf ist ein Modell.']];
       const enz = [['Pepsin (Magen)', 2, '#be185d'], ['Speichel-Amylase (Mund)', 7, C.teal], ['Lactase (Dünndarm)', 7, C.orange], ['Trypsin (Dünndarm)', 8, C.blue]];
       function enzymeState(denat, slow) {
         const p = denat < 0.5 ? M.enzymePath(70, 60, 18, 22, 46, 34) : 'M24,60 C34,30 50,86 66,50 S96,80 110,44 S128,70 120,80';
@@ -824,7 +824,7 @@
 
   /* ---- 14 Hemmung ---- */
   labs.inhibition = {
-    title: 'Enzymhemmung', topic: 't10', icon: '⛔',
+    title: 'Enzymhemmung', topic: 't10', icon: '',
     desc: 'Kompetitive, nicht-kompetitive (allosterische) und irreversible Hemmung.',
     mount(el) {
       const ui = frame(el, { tabs: ['Kompetitiv', 'Nicht-kompetitiv / allosterisch', 'Irreversibel'] });
@@ -842,7 +842,7 @@
       const g = id => el.querySelector('#' + id);
       const texts = [
         ['Kompetitive Hemmung', '<p>Der Inhibitor ist dem Substrat <b>strukturell ähnlich</b> und konkurriert mit ihm um das <b>aktive Zentrum</b>. Solange er gebunden ist, entsteht kein Enzym-Substrat-Komplex. Die Bindung ist <b>reversibel</b>.</p><ul><li><b>K<sub>M</sub> steigt</b>: mehr Substrat nötig, um ½ v<sub>max</sub> zu erreichen (scheinbar geringere Affinität).</li><li><b>v<sub>max</sub> bleibt gleich</b>: Bei sehr hoher Substratkonzentration verdrängt das Substrat den Inhibitor.</li></ul><p class="small muted">Beispiel: Allopurinol hemmt die Xanthinoxidase (Gicht); Sulfonamide.</p>'],
-        ['Nicht-kompetitive / allosterische Hemmung', '<p>Der Inhibitor ist dem Substrat <b>nicht ähnlich</b> und bindet <b>außerhalb des aktiven Zentrums</b> (allosterisch: am allosterischen Zentrum). Dadurch ändert sich die <b>Raumstruktur</b> des Enzyms einschließlich des aktiven Zentrums – das Enzym ist inaktiv. Keine Konkurrenz mit dem Substrat. Reversibel.</p><ul><li><b>v<sub>max</sub> sinkt</b>: Gehemmte Enzyme fallen aus – auch viel Substrat hilft nicht.</li><li><b>K<sub>M</sub> bleibt gleich</b>: Die übrigen aktiven Enzyme haben unveränderte Affinität.</li></ul><p class="small muted">Beispiel: Tyrosinkinase-Hemmer bei Leukämie.</p>'],
+        ['Nicht-kompetitive / allosterische Hemmung', '<p>Der Inhibitor ist dem Substrat <b>nicht ähnlich</b> und bindet <b>außerhalb des aktiven Zentrums</b>. Dadurch ändert sich die <b>Raumstruktur</b> des Enzyms einschließlich des aktiven Zentrums – das Enzym ist inaktiv. Keine Konkurrenz mit dem Substrat. Reversibel.</p><ul><li><b>v<sub>max</sub> sinkt</b>: Gehemmte Enzyme fallen aus – auch viel Substrat hilft nicht.</li><li><b>K<sub>M</sub> bleibt gleich</b>: Die übrigen aktiven Enzyme haben unveränderte Affinität.</li></ul><p class="small muted">Beispiel: Tyrosinkinase-Hemmer bei Leukämie.</p>'],
         ['Irreversible Hemmung', '<p>Der Inhibitor bindet <b>dauerhaft</b> (meist im aktiven Zentrum) – das Enzym ist endgültig funktionslos. Auswaschen hilft nicht, mehr Substrat auch nicht.</p><ul><li><b>Penicillin</b>: bindet irreversibel am aktiven Zentrum eines bakteriellen Enzyms der Zellwandbildung.</li><li><b>Blei-/Quecksilber-Ionen</b>: binden an SH-Gruppen von Enzymen und lösen sich nicht wieder → Gefahr durch alte Bleirohre.</li></ul><p class="small muted">Probiere: Inhibitor zugeben, dann auswaschen.</p>']
       ];
       function upd() {

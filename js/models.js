@@ -149,7 +149,7 @@ ${o.bare ? '' : T(124, 100, 'hydrophiler Kopf', { size: 13, fill: C.teal, anchor
     ]
   };
 
-  /* ---- Biomembran (Flüssig-Mosaik-Modell) ---- */
+  /* ---- Biomembran (Modell S. 15, B2) ---- */
   F.membrane = {
     title: 'Modell einer Biomembran', viewBox: '0 0 780 430',
     render(o) {
@@ -211,7 +211,7 @@ ${o.bare ? '' : T(16, 28, 'extrazellulärer Raum', { anchor: 'start', size: 14, 
       glycoprotein: ['Protein mit Kohlenhydratkette (Glykoprotein)', 'Integrales Protein, das auf der Außenseite eine Kohlenhydratkette trägt. Kohlenhydratketten sind Teil der Glykokalyx und dienen der Zellerkennung.'],
       carbs: ['Kohlenhydrate (Glykolipid / Glykokalyx)', 'Kohlenhydratketten befinden sich nur auf der Außenseite der Membran, gebunden an Lipide (Glykolipide) oder Proteine (Glykoproteine). Zusammen bilden sie die Glykokalyx, die der Erkennung von Zellen dient.'],
       cholesterol: ['Cholesterin', 'Lipid zwischen den Phospholipiden (in tierischen Membranen bis 25 %). Es verhindert, dass die Membran bei tiefen Temperaturen zu unbeweglich wird.'],
-      cyto: ['Filamente des Cytoskeletts', 'Proteinfasern an der Innenseite (Cytoplasmaseite). Sie stabilisieren Membran und Zellform, verankern Proteine und schränken deren Beweglichkeit ein (Fence-Modell, Buch S. 19).']
+      cyto: ['Filamente des Cytoskeletts', 'Proteinfasern an der Innenseite (Cytoplasmaseite), eingezeichnet im Membranmodell (Buch S. 15, B2).']
     }
   };
 

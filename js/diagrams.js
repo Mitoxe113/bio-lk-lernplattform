@@ -26,8 +26,8 @@
   /* ---------- Aufgabensätze ---------- */
   const SETS = {
     mm: {
-      topic: 't8', title: 'Michaelis-Menten-Diagramm', icon: '📈', chart: 'mm',
-      desc: 'Reaktionsgeschwindigkeit v in Abhängigkeit von der Substratkonzentration c(S) (Buch S. 34).',
+      topic: 't8', title: 'Michaelis-Menten-Diagramm', icon: '', chart: 'mm',
+      desc: 'Reaktionsgeschwindigkeit v in Abhängigkeit von der Substratkonzentration c(S) (Buch S. 33, B3).',
       tasks: [
         { id: 'achsen', type: 'axes', goal: 't8g1', title: 'Achsen beschriften', q: 'Beschrifte die Achsen des Diagramms zur Abhängigkeit der Reaktionsgeschwindigkeit von der Substratkonzentration.', curves: [[mmF, C.teal]],
           x: 'Substratkonzentration c(S)', y: 'Reaktionsgeschwindigkeit v', distract: ['Temperatur in °C', 'Zeit t', 'Enzymkonzentration c(E)', 'pH-Wert', 'Aktivierungsenergie EA'] },
@@ -47,8 +47,8 @@
       ]
     },
     temp: {
-      topic: 't9', title: 'Temperatur-Diagramm', icon: '🌡', chart: 'temp',
-      desc: 'Enzymaktivität in Abhängigkeit von der Temperatur: RGT-Regel und Denaturierung (Buch S. 36).',
+      topic: 't9', title: 'Temperatur-Diagramm', icon: '', chart: 'temp',
+      desc: 'Enzymaktivität in Abhängigkeit von der Temperatur: RGT-Regel und Denaturierung (Buch S. 36, B2 und B3).',
       tasks: [
         { id: 'achsen', type: 'axes', goal: 't9g3', title: 'Achsen beschriften', q: 'Beschrifte die Achsen des Diagramms.', curves: [[tempF, C.teal]],
           x: 'Temperatur in °C', y: 'Enzymaktivität (Reaktionsgeschwindigkeit)', distract: ['pH-Wert', 'Substratkonzentration c(S)', 'Zeit t', 'Energie', 'Inhibitorkonzentration'] },
@@ -67,8 +67,8 @@
       ]
     },
     ph: {
-      topic: 't9', title: 'pH-Diagramm', icon: '🧪', chart: 'ph',
-      desc: 'Enzymaktivität in Abhängigkeit vom pH-Wert: pH-Optimum und Angepasstheit an den Wirkort (Buch S. 37).',
+      topic: 't9', title: 'pH-Diagramm', icon: '', chart: 'ph',
+      desc: 'Enzymaktivität in Abhängigkeit vom pH-Wert: pH-Optimum und Angepasstheit an den Wirkort (Buch S. 37, B4).',
       tasks: [
         { id: 'achsen', type: 'axes', goal: 't9g3', title: 'Achsen beschriften', q: 'Beschrifte die Achsen des Diagramms.', curves: [[amyF, C.teal]],
           x: 'pH-Wert', y: 'Enzymaktivität (Reaktionsgeschwindigkeit)', distract: ['Temperatur in °C', 'Substratkonzentration c(S)', 'Zeit t', 'Protonenzahl', 'Energie'] },
@@ -87,8 +87,8 @@
       ]
     },
     hemmung: {
-      topic: 't10', title: 'Enzymhemmung im Diagramm', icon: '⛔', chart: 'mm',
-      desc: 'v–c(S)-Diagramme mit und ohne Inhibitor: kompetitive und nicht-kompetitive Hemmung (Buch S. 38–39).',
+      topic: 't10', title: 'Enzymhemmung im Diagramm', icon: '', chart: 'mm',
+      desc: 'v–c(S)-Diagramme mit und ohne Inhibitor: kompetitive und nicht-kompetitive Hemmung (Buch S. 40, B1 und S. 41, B4).',
       tasks: [
         { id: 'erkennen', type: 'mc', goal: 't10g4', title: 'Hemmtyp erkennen', q: 'Kurve A zeigt die Reaktion ohne Inhibitor. Welche Zuordnung ist richtig?',
           curves: [[mmF, C.teal, 'A'], [compF, C.orange, 'B'], [nonF, C.rose, 'C']],
@@ -193,7 +193,7 @@
         let score = rms < 0.09 ? 3 : rms < 0.15 ? 2 : rms < 0.24 ? 1 : 0;
         let msg = `Abweichung zur Modellkurve: ${(rms * 100).toFixed(0)} % der Achsenhöhe.`;
         if (cover < 0.6) { score = Math.min(score, 1); msg += ' Die Kurve deckt nicht den ganzen Bereich ab.'; }
-        const verdict = ['Der Verlauf passt noch nicht.', 'Grundform teilweise erkennbar.', 'Gut – der Verlauf stimmt im Wesentlichen.', 'Sehr gut getroffen!'][score];
+        const verdict = ['Der Verlauf passt noch nicht.', 'Grundform teilweise erkennbar.', 'Gut – der Verlauf stimmt im Wesentlichen.', 'Verlauf getroffen.'][score];
         return { score, max: 3, detail: `${verdict} ${msg}<br><span class="small">${esc(task.hint)}</span>` };
       },
       reveal() { ch.fn(task.model, { color: C.teal, width: 3, dash: '2 0', layer: 'top', opacity: 0.85 }); ch.textPx(ch.opts.w - ch.opts.pad.r - 4, ch.opts.pad.t + 12, 'türkis = Modellkurve', { anchor: 'end', size: 12, color: C.teal, layer: 'top' }); }
@@ -289,7 +289,7 @@
     const i = BIO.clamp(tIdx || 0, 0, set.tasks.length - 1);
     const task = set.tasks[i], key = sid + '-' + task.id;
     main.innerHTML = `${backLink('#/diagramme', 'Diagramm-Trainer')}
-      <div class="page-head"><div class="row"><h1 class="mb0">${set.icon} ${esc(set.title)}</h1>${topicChip(set.topic)}</div><p>${esc(set.desc)}</p></div>
+      <div class="page-head"><div class="row"><h1 class="mb0">${esc(set.title)}</h1>${topicChip(set.topic)}</div><p>${esc(set.desc)}</p></div>
       <div class="tabs" role="tablist">${set.tasks.map((t, k) => `<button type="button" class="${k === i ? 'on' : ''}" data-t="${k}">${k + 1}. ${esc(t.title)}</button>`).join('')}</div>
       <div class="card"><div class="ex-head"><div class="row"><span class="chip navy">${TYPE_LABEL[task.type]}</span>${scoreChip(key)}</div><span class="small muted">Aufgabe ${i + 1} von ${set.tasks.length}</span></div>
         <div class="q-text">${esc(task.q)}</div><p class="small muted"><b>Lernziel:</b> ${esc(goalText(task.goal))}</p>
@@ -318,8 +318,8 @@
   }
   function hub(main) {
     main.innerHTML = `<div class="page-head"><h1>Diagramm-Trainer</h1><p>Übe die vier klausurrelevanten Diagrammtypen: Achsen beschriften, Kurven zeichnen, Punkte markieren, Kurven erkennen und vergleichen sowie Verläufe beschreiben und molekular erklären. Zeichnen funktioniert mit Finger, Stift oder Maus.</p></div>
-      <div class="grid grid-2">${Object.keys(SETS).map(sid => { const s = SETS[sid]; return `<a class="card hub-card" href="#/diagramme/${sid}"><div class="hub-icon">${s.icon}</div><div><h3>${esc(s.title)}</h3><p>${esc(s.desc)}</p><p class="row mt">${topicChip(s.topic)}${s.tasks.map(t => scoreChip(sid + '-' + t.id)).join('')}</p></div></a>`; }).join('')}</div>
-      <div class="box note"><div class="box-title">💡 Tipp für die Klausur</div><p>Diagramme immer in drei Schritten bearbeiten: <b>1. Beschreiben</b> (was zeigt die Kurve? Anstieg, Maximum, Abfall, Grenzwert), <b>2. Erklären</b> (molekulare Ursache: Molekularbewegung, aktives Zentrum, Denaturierung, Hemmung), <b>3. Vergleichen/Bewerten</b> (Unterschiede zwischen Kurven mit Fachbegriffen benennen).</p></div>`;
+      <div class="grid grid-2">${Object.keys(SETS).map(sid => { const s = SETS[sid]; return `<a class="card hub-card" href="#/diagramme/${sid}"><div><h3>${esc(s.title)}</h3><p>${esc(s.desc)}</p><p class="row mt">${topicChip(s.topic)}${s.tasks.map(t => scoreChip(sid + '-' + t.id)).join('')}</p></div></a>`; }).join('')}</div>
+      <div class="box note"><div class="box-title">Vorgehen bei Diagrammaufgaben</div><p>Diagramme immer in drei Schritten bearbeiten: <b>1. Beschreiben</b> (was zeigt die Kurve? Anstieg, Maximum, Abfall, Grenzwert), <b>2. Erklären</b> (molekulare Ursache: Molekularbewegung, aktives Zentrum, Denaturierung, Hemmung), <b>3. Vergleichen/Bewerten</b> (Unterschiede zwischen Kurven mit Fachbegriffen benennen).</p></div>`;
   }
   BIO.routes.diagramme = function (main, parts, q) {
     const sid = parts[1];

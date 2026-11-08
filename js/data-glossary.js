@@ -43,12 +43,10 @@
   g('Biomembran', 't3', 'Hülle von Zellen und Organellen aus Lipiddoppelschicht, Proteinen und Kohlenhydraten.', 'Trennt Reaktionsräume (Kompartimentierung) und kontrolliert den Stoffaustausch.', 'Zellmembran.', true);
   g('Integrale Proteine', 't3', 'In die Lipiddoppelschicht eingelagerte, oft durchspannende Membranproteine.', 'Hydrophober Mittelteil im Membraninneren; Funktion z. B. als Kanal, Carrier oder Rezeptor.', 'Aquaporin, Na⁺-K⁺-Pumpe.', true);
   g('Periphere Proteine', 't3', 'Der Membran angelagerte Proteine.', 'An Phospholipide oder integrale Proteine gebunden; durchspannen die Membran nicht.', '—', true);
-  g('Zytoskelett', 't3', 'Netz aus Proteinfilamenten im Cytoplasma.', 'An der Membraninnenseite stabilisiert es Membran und Zellform, verankert Proteine und begrenzt ihre Beweglichkeit (Fence-Modell).', '—', true);
+  g('Zytoskelett', 't3', 'Netz aus Proteinfilamenten im Cytoplasma.', 'Im Modell der Biomembran (S. 15, B2) als Filamente an der Cytoplasmaseite eingezeichnet.', '—', true);
   g('Kohlenhydrate (Membran)', 't3', 'Kohlenhydratketten auf der Außenseite der Membran, gebunden an Proteine oder Lipide.', 'Bilden die Glykokalyx, die der Zellerkennung dient.', 'Glykoproteine, Glykolipide.', true);
   g('Glykokalyx', 't3', 'Kohlenhydratmantel auf der Außenseite der Zellmembran.', 'Dient der Erkennung von Zellen.', '—');
   g('Cholesterin', 't3', 'Lipid zwischen den Phospholipiden tierischer Membranen (bis 25 %).', 'Verhindert, dass die Membran bei Kälte zu unbeweglich wird.', '—');
-  g('Flüssig-Mosaik-Modell', 't3', 'Membranmodell von Singer und Nicolson (1972).', 'Flüssige Lipiddoppelschicht mit beweglichen, mosaikartig eingelagerten Proteinen. Gilt heute eingeschränkt (Fence-Modell, Lipid Rafts).', 'Zellfusionsexperiment von Frye und Edidin.');
-  g('Fence-Modell', 't3', 'Modell, nach dem das Cytoskelett wie ein Zaun die Beweglichkeit von Membranproteinen begrenzt (Kusumi 1996).', 'Erklärt, warum ein Teil der Proteine unbeweglich ist und Transporter auf einer Zellseite bleiben.', 'Glucosetransporter der Darmzellen.');
 
   // Thema 4
   g('Einfache Diffusion', 't4', 'Passiver Transport direkt durch die Lipiddoppelschicht.', 'Nur kleine, ungeladene Teilchen; entlang des Konzentrationsgefälles ohne Energie.', 'O₂, CO₂.', true);
@@ -63,7 +61,7 @@
   g('Konzentrationsgefälle', 't4', 'Unterschied der Konzentration eines Stoffes zwischen zwei Bereichen.', 'Bestimmt die Richtung des passiven Transports (hoch → niedrig).', '—');
   g('Carrier', 't4', 'Membrantransportprotein mit Bindungsstelle für ein bestimmtes Teilchen.', 'Ändert beim Transport seine Form; kann passiv oder (als Pumpe/Symporter) aktiv transportieren.', 'Glucose-Carrier.');
   g('Aquaporine', 't4', 'Ständig geöffnete, hochselektive Wasserkanäle.', 'Ermöglichen schnellen Wassertransport (kanalvermittelte Diffusion).', '—');
-  g('Na⁺-K⁺-Ionenpumpe', 't4', 'Membranprotein, das unter ATP-Verbrauch Na⁺ aus der Zelle und K⁺ in die Zelle pumpt.', 'Primär aktiver Antiport; hält Na⁺ in der Zelle niedrig (Ergänzung: 3 Na⁺ / 2 K⁺ pro ATP).', 'Darmepithelzelle.');
+  g('Na⁺-K⁺-Ionenpumpe', 't4', 'Membranprotein, das unter ATP-Verbrauch Na⁺ aus der Zelle und K⁺ in die Zelle pumpt.', 'Primär aktiver Antiport; hält Na⁺ in der Zelle niedrig (Buch S. 21).', 'Darmepithelzelle.');
 
   // Thema 5
   g('Endozytose', 't5', 'Aufnahme von Stoffen durch Einstülpung und Abschnürung der Zellmembran als Vesikel.', 'Vesikeltransport zählt zum aktiven Transport.', 'Aufnahme von Eisen-Ionen.', true);
@@ -118,11 +116,9 @@
   // Thema 10
   g('Kompetitive Hemmung', 't10', 'Hemmung durch einen substratähnlichen Inhibitor, der mit dem Substrat um das aktive Zentrum konkurriert.', 'Reversibel; vmax unverändert (bei hoher c(S) erreichbar), KM erhöht.', 'Allopurinol, Sulfonamide.', true);
   g('reversibel', 't10', 'Umkehrbar.', 'Ein reversibler Inhibitor bindet nur vorübergehend und löst sich wieder.', 'Kompetitive und nicht-kompetitive Hemmung.', true);
-  g('Nicht-kompetitive / allosterische Hemmung', 't10', 'Hemmung durch einen Inhibitor, der außerhalb des aktiven Zentrums (allosterisch: am allosterischen Zentrum) bindet und die Raumstruktur verändert.', 'Keine Konkurrenz mit dem Substrat; reversibel; vmax sinkt, KM bleibt gleich.', 'Tyrosinkinase-Hemmer bei Leukämie.', true);
+  g('Nicht-kompetitive / allosterische Hemmung', 't10', 'Hemmung durch einen Inhibitor, der außerhalb des aktiven Zentrums bindet und die Raumstruktur verändert (Buch S. 40–41; die Checkliste nennt zusätzlich „allosterisch“).', 'Keine Konkurrenz mit dem Substrat; reversibel; vmax sinkt, KM bleibt gleich.', 'Tyrosinkinase-Hemmer bei Leukämie.', true);
   g('Irreversible Hemmung', 't10', 'Dauerhafte Bindung eines Inhibitors, die das Enzym endgültig funktionslos macht.', 'Nicht durch Substrat oder Auswaschen aufhebbar.', 'Penicillin; Blei- und Quecksilber-Ionen an SH-Gruppen.', true);
   g('Inhibitor', 't10', 'Hemmstoff, der die Aktivität eines Enzyms verringert.', 'Wirkung hängt von der Bindungsstelle ab (aktives Zentrum oder andere Stelle).', '—');
-  g('Allosterisches Zentrum', 't10', 'Vom aktiven Zentrum räumlich getrennte Bindungsstelle für Aktivatoren oder Inhibitoren.', 'allos = anders, stereos = räumlich; Bindung verändert die Form des Enzyms (aktiv/inaktiv).', '—');
-  g('Kooperativität', 't10', 'Gemeinsame Strukturänderung aller Untereinheiten eines allosterischen Enzyms.', 'Führt zu einem s-förmigen (sigmoiden) Kurvenverlauf.', '—');
   g('Endprodukthemmung', 't10', 'Ergänzung: Das Endprodukt eines Stoffwechselweges hemmt (meist allosterisch) das erste Enzym des Weges.', 'Negative Rückkopplung zur Regulation – nicht im Buch, als Beispiel für die Regulationsbedeutung.', '—');
 
   BIO.glossary = G.sort((a, b) => a.term.localeCompare(b.term, 'de'));

@@ -19,7 +19,7 @@
         <label class="toggle mt"><input type="checkbox" id="exTimer" checked> Zeit anzeigen (Richtwert: 3 min pro Aufgabe)</label>
         <div class="row mt"><button type="button" class="btn primary" data-a="start">Klausur starten</button><span class="small muted" data-r="msg"></span></div></div>
       <h2>Bisherige Ergebnisse</h2>
-      <div class="card">${last.length ? last.slice(0, 10).map(e => `<div class="result-row"><span>${fmtDate(e.ts)} · ${e.count} Aufgaben · ${e.topics.length === BIO.topics.length ? 'alle Themen' : 'Themen ' + e.topics.map(t => BIO.topicById[t] ? BIO.topicById[t].nr : t).join(', ')}</span><b>${String(e.score).replace('.', ',')}/${e.max} P. · ${pct(e.score, e.max)} %${e.grade != null ? ` · ${e.grade} NP` : ''}</b></div>`).join('') : '<p class="muted">Noch keine Probeklausur geschrieben.</p>'}</div>`;
+      <div class="card">${last.length ? last.slice(0, 10).map(e => `<div class="result-row"><span>${fmtDate(e.ts)} · ${e.count} Aufgaben · ${e.topics.length === BIO.topics.length ? 'alle Themen' : 'Themen ' + e.topics.map(t => BIO.topicById[t] ? BIO.topicById[t].nr : t).join(', ')}</span><b>${String(e.score).replace('.', ',')}/${e.max} P. · ${pct(e.score, e.max)} %</b></div>`).join('') : '<p class="muted">Noch keine Probeklausur geschrieben.</p>'}</div>`;
     $('[data-a=all]', main).addEventListener('click', () => $$('[name=tp]', main).forEach(c => c.checked = true));
     $('[data-a=none]', main).addEventListener('click', () => $$('[name=tp]', main).forEach(c => c.checked = false));
     $('[data-a=start]', main).addEventListener('click', () => {
@@ -168,17 +168,16 @@
       const max = s.items.reduce((a, it) => a + it.max, 0);
       const score = s.items.reduce((a, it) => a + (it.score || 0), 0);
       const p = pct(score, max);
-      const np = notenpunkte(score / max);
       const openPending = s.items.filter(it => it.kind === 'open' && it.self == null).length;
       const wrongGoals = [...new Set(s.items.filter(it => it.score / it.max < 0.7).map(it => it.x.goal).filter(Boolean))];
       const mins = Math.round((s.end - s.start) / 60000);
       main.innerHTML = `${backLink('#/klausur', 'Klausurmodus')}<div class="page-head"><h1>Auswertung</h1><p>Bearbeitungszeit: ${mins} min · ${s.items.length} Aufgaben</p></div>
         <div class="card"><div class="row" style="gap:24px"><div class="ring" style="--p:${p}"><div><div><b>${p} %</b><small>${String(score).replace('.', ',')}/${max} P.</small></div></div></div>
-          <div style="flex:1;min-width:220px"><p class="mb0"><b>Orientierung:</b> ca. <b>${np} Notenpunkte</b> <span class="small muted">(Richtwert nach üblicher Oberstufen-Tabelle, ersetzt keine Lehrerbewertung)</span></p>
+          <div style="flex:1;min-width:220px">
           ${openPending ? `<div class="box warn mt"><div class="box-title">Noch ${openPending} offene Aufgabe(n) selbst bewerten</div><p class="mb0">Hake unten bei den offenen Aufgaben ab, was du erwähnt hast – das Ergebnis aktualisiert sich.</p></div>` : ''}
-          <div class="row mt"><button type="button" class="btn primary" data-a="save" ${s.saved ? 'disabled' : ''}>${s.saved ? '✓ Ergebnis gespeichert' : 'Ergebnis speichern'}</button><a class="btn" href="#/klausur">Neue Klausur</a><a class="btn ghost" href="#/uebungen/fehler">Fehlerliste</a></div></div></div></div>
+          <div class="row mt"><button type="button" class="btn primary" data-a="save" ${s.saved ? 'disabled' : ''}>${s.saved ? 'Ergebnis gespeichert' : 'Ergebnis speichern'}</button><a class="btn" href="#/klausur">Neue Klausur</a><a class="btn ghost" href="#/uebungen/fehler">Fehlerliste</a></div></div></div></div>
         <h2>Nicht beherrschte Lernziele (${wrongGoals.length})</h2>
-        <div class="card">${wrongGoals.length ? `<ul class="goal-list">${wrongGoals.map(g => { const go = BIO.goalById[g]; return `<li><span>${go ? `<a class="chip navy" href="#/lernzettel/${go.topic}">Thema ${BIO.topicById[go.topic].nr}</a> ` : ''}${esc(goalText(g))}</span>${BIO.statusGroup('goal', g, store.state.goals[g])}</li>`; }).join('')}</ul>` : '<p>🎉 Alle geprüften Lernziele beherrscht.</p>'}</div>
+        <div class="card">${wrongGoals.length ? `<ul class="goal-list">${wrongGoals.map(g => { const go = BIO.goalById[g]; return `<li><span>${go ? `<a class="chip navy" href="#/lernzettel/${go.topic}">Thema ${BIO.topicById[go.topic].nr}</a> ` : ''}${esc(goalText(g))}</span>${BIO.statusGroup('goal', g, store.state.goals[g])}</li>`; }).join('')}</ul>` : '<p>Alle geprüften Lernziele beherrscht.</p>'}</div>
         <h2>Alle Aufgaben mit Lösungen</h2>
         <div class="card">${s.items.map((it, k) => itemResult(it, k)).join('')}</div>`;
       $$('[data-self]', main).forEach(box => {
@@ -199,18 +198,13 @@
           else if (it.kind === 'open' && it.self != null) { store.recordError('open', it.x.id, it.x.topic, ok, it.x.goal); store.recordEx('open:' + it.x.id, it.score, it.max); }
           else if (it.kind === 'diag') { store.recordError('diag', it.x.key, it.x.topic, ok, it.x.goal); store.recordEx('diag:' + it.x.key, it.score, it.max); }
         });
-        store.addExam({ ts: s.end, score, max, count: s.items.length, topics: s.topics, level: s.lvl, grade: np, wrongGoals });
+        store.addExam({ ts: s.end, score, max, count: s.items.length, topics: s.topics, level: s.lvl, wrongGoals });
         s.saved = true; BIO.toast('Ergebnis gespeichert – Fehler wurden in deine Fehlerliste übernommen.');
         document.dispatchEvent(new CustomEvent('bio:progress'));
         const y = window.scrollY; render(); window.scrollTo(0, y);
       });
     }
     render();
-  }
-  function notenpunkte(f) {
-    const t = [0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50, 0.45, 0.40, 0.33, 0.27, 0.20];
-    for (let i = 0; i < t.length; i++) if (f >= t[i]) return 15 - i;
-    return 0;
   }
   function itemResult(it, k) {
     const x = it.x, full = it.score >= it.max, part = it.score > 0;

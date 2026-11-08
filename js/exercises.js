@@ -35,19 +35,19 @@
     const errs = Object.keys(store.state.errors).length;
     const due = BIO.cards.filter(BIO.cardDue).length;
     const items = [
-      ['quiz', '✔', 'Multiple Choice', `${BIO.mc.length} Fragen mit Feedback und Erklärung. Falsche Antworten werden automatisch wiederholt.`],
-      ['karten', '🗂', 'Karteikarten', `${BIO.cards.length} Karten im Leitner-System · heute fällig: ${due}`],
-      ['lueckentext', '✎', 'Lückentexte', `${BIO.cloze.length} Texte – Fachbegriffe einsetzen.`],
-      ['zuordnung', '⇆', 'Zuordnung', `${BIO.matching.length} Aufgaben – Begriffe passend zuordnen.`],
-      ['reihenfolge', '↕', 'Reihenfolge', `${BIO.ordering.length} Abläufe in die richtige Reihenfolge bringen.`],
-      ['beschriften', '🏷', 'Beschriften', `${BIO.labeling.length} Abbildungen beschriften (antippen statt ziehen).`],
-      ['offen', '📝', 'Offene Klausurfragen', `${BIO.open.length} Fragen mit Musterlösung, Checkliste und Selbstbewertung.`],
-      ['mix', '🎲', 'Zufällige Mischfragen', '12 zufällige Fragen aus allen Themen.'],
-      ['fehler', '⚠', 'Meine Fehlerliste', errs ? `${errs} Einträge – gezielt wiederholen.` : 'Noch keine Fehler gespeichert.']
+      ['quiz', '', 'Multiple Choice', `${BIO.mc.length} Fragen mit Feedback und Erklärung. Falsche Antworten werden automatisch wiederholt.`],
+      ['karten', '', 'Karteikarten', `${BIO.cards.length} Karten im Leitner-System · heute fällig: ${due}`],
+      ['lueckentext', '', 'Lückentexte', `${BIO.cloze.length} Texte – Fachbegriffe einsetzen.`],
+      ['zuordnung', '', 'Zuordnung', `${BIO.matching.length} Aufgaben – Begriffe passend zuordnen.`],
+      ['reihenfolge', '', 'Reihenfolge', `${BIO.ordering.length} Abläufe in die richtige Reihenfolge bringen.`],
+      ['beschriften', '', 'Beschriften', `${BIO.labeling.length} Abbildungen beschriften (antippen statt ziehen).`],
+      ['offen', '', 'Offene Klausurfragen', `${BIO.open.length} Fragen mit Musterlösung, Checkliste und Selbstbewertung.`],
+      ['mix', '', 'Zufällige Mischfragen', '12 zufällige Fragen aus allen Themen.'],
+      ['fehler', '', 'Meine Fehlerliste', errs ? `${errs} Einträge – gezielt wiederholen.` : 'Noch keine Fehler gespeichert.']
     ];
     main.innerHTML = `<div class="page-head"><h1>Übungen</h1><p>Jede Aufgabe ist einem Thema und einem Lernziel der Checkliste zugeordnet. Dein Fortschritt wird automatisch gespeichert.</p></div>
       <div class="grid grid-3">${items.map(i => `<a class="card hub-card" href="#/uebungen/${i[0]}"><div class="hub-icon">${i[1]}</div><div><h3>${i[2]}</h3><p>${i[3]}</p></div></a>`).join('')}
-      <a class="card hub-card" href="#/diagramme"><div class="hub-icon">📈</div><div><h3>Diagramme</h3><p>Achsen, Kurven zeichnen, Punkte markieren – im Diagramm-Trainer.</p></div></a></div>
+      <a class="card hub-card" href="#/diagramme"><div><h3>Diagramme</h3><p>Achsen, Kurven zeichnen, Punkte markieren – im Diagramm-Trainer.</p></div></a></div>
       <h2>Gezielt ein Thema trainieren</h2>
       <div class="card"><ul class="goal-list">${BIO.topics.map(t => `<li><span><b>${t.nr}. ${esc(t.title)}</b></span><span class="row"><a class="btn small" href="#/uebungen/quiz?topic=${t.id}">Quiz</a><a class="btn small" href="#/uebungen/karten?topic=${t.id}">Karten</a><a class="btn small" href="#/uebungen/offen?topic=${t.id}">Offene Fragen</a></span></li>`).join('')}</ul></div>`;
   }
@@ -71,7 +71,7 @@
       $('#fErr', main).addEventListener('change', e => { location.hash = hashWith('#/uebungen/quiz', Object.assign({}, q, { mode: e.target.checked ? 'fehler' : '' })); });
     }
     const box = $('[data-r=box]', main);
-    if (!pool.length) { box.innerHTML = `<p>${q.mode === 'fehler' || opts.errorsOnly ? '🎉 Keine offenen Fehler in dieser Auswahl.' : 'Keine Fragen in dieser Auswahl.'}</p><a class="btn" href="#/uebungen/quiz">Alle Fragen</a>`; return; }
+    if (!pool.length) { box.innerHTML = `<p>${q.mode === 'fehler' || opts.errorsOnly ? 'Keine offenen Fehler in dieser Auswahl.' : 'Keine Fragen in dieser Auswahl.'}</p><a class="btn" href="#/uebungen/quiz">Alle Fragen</a>`; return; }
     const queue = pool.map(x => ({ q: x, retry: false }));
     let i = 0, right = 0, firstTry = 0;
     const wrongList = [];
@@ -93,7 +93,7 @@
         store.recordMC(x, ok);
         if (ok) { right++; if (!it.retry) firstTry++; }
         else { if (!it.retry) { queue.push({ q: x, retry: true }); wrongList.push(x); } }
-        $('[data-r=fb]', box).innerHTML = `<div class="feedback ${ok ? 'ok' : 'bad'}"><b class="t">${ok ? '✓ Richtig!' : '✗ Leider falsch.'}</b>${esc(x.expl)}${!ok && !it.retry ? '<div class="small muted mt">Diese Frage kommt am Ende der Runde noch einmal.</div>' : ''}</div>
+        $('[data-r=fb]', box).innerHTML = `<div class="feedback ${ok ? 'ok' : 'bad'}"><b class="t">${ok ? 'Richtig' : 'Falsch'}</b>${esc(x.expl)}${!ok && !it.retry ? '<div class="small muted mt">Diese Frage kommt am Ende der Runde noch einmal.</div>' : ''}</div>
           ${goalLine(x.goal)}<div class="row mt"><span class="spacer"></span><button type="button" class="btn primary" data-a="next">${i + 1 < queue.length ? 'Weiter →' : 'Auswertung'}</button></div>`;
         $('[data-a=next]', box).focus();
         $('[data-a=next]', box).addEventListener('click', () => { i++; show(); });
@@ -104,7 +104,7 @@
       const p = Math.round(100 * firstTry / total);
       box.innerHTML = `<h2 class="mb0" style="margin-top:0">Auswertung</h2>
         <div class="row mt"><span class="score-badge">${firstTry}<span class="small muted">/ ${total}</span></span><span class="muted">beim ersten Versuch richtig (${p} %)</span></div>
-        ${wrongList.length ? `<h3>Falsch beantwortet</h3><ul>${wrongList.map(x => `<li>${esc(x.q)} <span class="small muted">→ ${esc(x.options[x.correct])}</span></li>`).join('')}</ul>` : '<p class="mt">🎉 Alles beim ersten Versuch richtig!</p>'}
+        ${wrongList.length ? `<h3>Falsch beantwortet</h3><ul>${wrongList.map(x => `<li>${esc(x.q)} <span class="small muted">→ ${esc(x.options[x.correct])}</span></li>`).join('')}</ul>` : '<p class="mt">Alles beim ersten Versuch richtig.</p>'}
         <div class="row mt"><button type="button" class="btn primary" data-a="again">Neue Runde</button>${wrongList.length ? '<a class="btn" href="#/uebungen/fehler">Zur Fehlerliste</a>' : ''}<a class="btn ghost" href="#/uebungen">Übersicht</a></div>`;
       $('[data-a=again]', box).addEventListener('click', () => quiz(main, q, opts));
     }
@@ -127,19 +127,19 @@
     let list = mode === 'alle' ? pool : mode === 'schwer' ? pool.filter(c => (BIO.cardInfo(c).box || 1) <= 2) : due;
     list = shuffle(list);
     const box = $('[data-r=box]', main);
-    if (!list.length) { box.innerHTML = `<div class="card"><p>🎉 Keine fälligen Karten in dieser Auswahl. Wähle „Alle Karten“, um trotzdem zu üben.</p></div>`; return; }
+    if (!list.length) { box.innerHTML = `<div class="card"><p>Keine fälligen Karten in dieser Auswahl. Wähle „Alle Karten“, um trotzdem zu üben.</p></div>`; return; }
     const queue = list.slice();
     let i = 0, stats = { ok: 0, unsure: 0, no: 0 };
     function show() {
       if (i >= queue.length) {
-        box.innerHTML = `<div class="card"><h2 style="margin-top:0">Runde beendet</h2><p>✓ Gewusst: <b>${stats.ok}</b> · ? Unsicher: <b>${stats.unsure}</b> · ✗ Nicht gewusst: <b>${stats.no}</b></p><div class="row"><button class="btn primary" data-a="again">Weiter üben</button><a class="btn ghost" href="#/uebungen">Übersicht</a></div></div>`;
+        box.innerHTML = `<div class="card"><h2 style="margin-top:0">Runde beendet</h2><p>Gewusst: <b>${stats.ok}</b> · Unsicher: <b>${stats.unsure}</b> · Nicht gewusst: <b>${stats.no}</b></p><div class="row"><button class="btn primary" data-a="again">Weiter üben</button><a class="btn ghost" href="#/uebungen">Übersicht</a></div></div>`;
         $('[data-a=again]', box).addEventListener('click', () => karten(main, q));
         return;
       }
       const c = queue[i], info = BIO.cardInfo(c);
       box.innerHTML = `<div class="ex-head"><div class="row">${topicChip(c.topic)}<span class="box-meter" title="Fach ${info.box || 1}">${[1, 2, 3, 4, 5].map(b => `<span class="${b <= (info.box || 1) ? 'on' : ''}"></span>`).join('')}</span></div><span class="small muted">Karte ${i + 1} von ${queue.length}</span></div>
         <div class="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen"><div class="inner"><div class="face front">${esc(c.front)}<span class="hint">antippen zum Umdrehen</span></div><div class="face back"><div><div class="small muted" style="margin-bottom:6px">${esc(c.front)}</div>${esc(c.back)}</div></div></div></div>
-        <div class="row hidden" data-r="rate" style="justify-content:center"><button class="btn ok" data-r="ok">✓ Gewusst</button><button class="btn warn" data-r="unsure">? Unsicher</button><button class="btn bad" data-r="no">✗ Nicht gewusst</button></div>`;
+        <div class="row hidden" data-r="rate" style="justify-content:center"><button class="btn ok" data-r="ok">Gewusst</button><button class="btn warn" data-r="unsure">Unsicher</button><button class="btn bad" data-r="no">Nicht gewusst</button></div>`;
       const fc = $('.flashcard', box);
       const flip = () => { fc.classList.toggle('flipped'); $('[data-r=rate]', box).classList.remove('hidden'); };
       fc.addEventListener('click', flip);
@@ -201,7 +201,7 @@
         if (good) ok++;
       });
       record('cloze', item, ok, inputs.length);
-      $('[data-r=fb]', el).innerHTML = `<div class="feedback ${ok === inputs.length ? 'ok' : 'bad'}"><b class="t">${ok} von ${inputs.length} Lücken richtig</b>${ok === inputs.length ? 'Sehr gut!' : 'Die richtigen Begriffe stehen grün neben den Lücken.'}</div>`;
+      $('[data-r=fb]', el).innerHTML = `<div class="feedback ${ok === inputs.length ? 'ok' : 'bad'}"><b class="t">${ok} von ${inputs.length} Lücken richtig</b>${ok === inputs.length ? '' : 'Die richtigen Begriffe stehen grün neben den Lücken.'}</div>`;
     });
     $('[data-a=solve]', el).addEventListener('click', () => { inputs.forEach(inp => { inp.value = answers[+inp.dataset.i][0]; inp.classList.remove('bad'); }); });
     $('[data-a=reset]', el).addEventListener('click', () => renderCloze(el, item));
@@ -242,7 +242,7 @@
         const ok = order.filter((k, pos) => k === pos).length;
         record('order', item, ok, order.length);
         draw(true);
-        $('[data-r=fb]', el).innerHTML = `<div class="feedback ${ok === order.length ? 'ok' : 'bad'}"><b class="t">${ok} von ${order.length} Schritten an der richtigen Position</b>${ok === order.length ? 'Perfekt!' : 'Rot markierte Schritte stehen noch falsch.'}</div>`;
+        $('[data-r=fb]', el).innerHTML = `<div class="feedback ${ok === order.length ? 'ok' : 'bad'}"><b class="t">${ok} von ${order.length} Schritten an der richtigen Position</b>${ok === order.length ? '' : 'Rot markierte Schritte stehen noch falsch.'}</div>`;
       });
       $('[data-a=solve]', el).addEventListener('click', () => { order = item.steps.map((s, i) => i); draw(true); });
       $('[data-a=reset]', el).addEventListener('click', () => renderOrder(el, item));
@@ -345,17 +345,17 @@
     main.innerHTML = `${backLink('#/uebungen', 'Übungen')}<div class="page-head"><h1>Meine Fehlerliste</h1><p>Alles, was du zuletzt falsch beantwortet oder als „nicht gewusst“ bewertet hast. Ein Eintrag verschwindet automatisch, sobald du die Aufgabe richtig löst.</p></div>
       ${rows.length ? `<div class="row" style="margin-bottom:14px">${mcCount ? `<a class="btn primary" href="#/uebungen/quiz?mode=fehler">Alle ${mcCount} Quizfehler wiederholen</a>` : ''}<a class="btn" href="#/uebungen/karten?mode=schwer">Schwierige Karten üben</a></div>
       <div class="card"><ul class="goal-list">${rows.map(r => `<li><span><span class="row" style="gap:6px;margin-bottom:4px">${topicChip(r.e.topic)}<span class="chip gray">${label[r.e.type] || r.e.type}</span><span class="chip bad">${r.e.count}× falsch</span></span>${esc(r.text)}</span><span class="row"><a class="btn small" href="${r.href}">Üben</a><button class="btn small ghost" data-del="${esc(r.key)}" title="Aus Liste entfernen">✕</button></span></li>`).join('')}</ul></div>`
-      : '<div class="card"><p>🎉 Deine Fehlerliste ist leer. Übe weiter – falsche Antworten landen automatisch hier.</p><a class="btn primary" href="#/uebungen/mix">Mischfragen starten</a></div>'}`;
+      : '<div class="card"><p>Die Fehlerliste ist leer. Falsch beantwortete Aufgaben erscheinen hier automatisch.</p><a class="btn primary" href="#/uebungen/mix">Mischfragen starten</a></div>'}`;
     $$('[data-del]', main).forEach(b => b.addEventListener('click', () => { store.removeError(b.dataset.del); fehler(main); }));
   }
 
   /* ======================= Routen ======================= */
   const cfgs = {
-    lueckentext: { route: 'lueckentext', kind: 'cloze', title: 'Lückentexte', sub: 'Setze die fehlenden Fachbegriffe ein. Groß-/Kleinschreibung ist egal.', icon: '✎', get items() { return BIO.cloze; }, render: renderCloze },
-    zuordnung: { route: 'zuordnung', kind: 'match', title: 'Zuordnung', sub: 'Ordne Begriffe und Aussagen richtig zu.', icon: '⇆', get items() { return BIO.matching; }, render: renderMatch },
-    reihenfolge: { route: 'reihenfolge', kind: 'order', title: 'Reihenfolge', sub: 'Bringe Abläufe in die richtige Reihenfolge.', icon: '↕', get items() { return BIO.ordering; }, render: renderOrder },
-    beschriften: { route: 'beschriften', kind: 'label', title: 'Beschriften', sub: 'Beschrifte Abbildungen – erst Begriff, dann Nummer antippen.', icon: '🏷', get items() { return BIO.labeling; }, render: renderLabel },
-    offen: { route: 'offen', kind: 'open', title: 'Offene Klausurfragen', sub: 'Antwort formulieren, mit Musterlösung vergleichen, selbst bewerten.', icon: '📝', get items() { return BIO.open; }, render: renderOpen }
+    lueckentext: { route: 'lueckentext', kind: 'cloze', title: 'Lückentexte', sub: 'Setze die fehlenden Fachbegriffe ein. Groß-/Kleinschreibung ist egal.', icon: '', get items() { return BIO.cloze; }, render: renderCloze },
+    zuordnung: { route: 'zuordnung', kind: 'match', title: 'Zuordnung', sub: 'Ordne Begriffe und Aussagen richtig zu.', icon: '', get items() { return BIO.matching; }, render: renderMatch },
+    reihenfolge: { route: 'reihenfolge', kind: 'order', title: 'Reihenfolge', sub: 'Bringe Abläufe in die richtige Reihenfolge.', icon: '', get items() { return BIO.ordering; }, render: renderOrder },
+    beschriften: { route: 'beschriften', kind: 'label', title: 'Beschriften', sub: 'Beschrifte Abbildungen – erst Begriff, dann Nummer antippen.', icon: '', get items() { return BIO.labeling; }, render: renderLabel },
+    offen: { route: 'offen', kind: 'open', title: 'Offene Klausurfragen', sub: 'Antwort formulieren, mit Musterlösung vergleichen, selbst bewerten.', icon: '', get items() { return BIO.open; }, render: renderOpen }
   };
   BIO.routes.uebungen = function (main, parts, q) {
     const sub = parts[1];

@@ -204,7 +204,7 @@
   function statusGroup(kind, id, current) {
     const cur = current || 'offen';
     return `<div class="status-group" data-kind="${kind}" data-id="${id}" role="group" aria-label="Status">` +
-      ['gelernt', 'unsicher', 'offen'].map(s => `<button type="button" data-s="${s}" class="${cur === s ? 'on' : ''}" aria-pressed="${cur === s}">${s === 'gelernt' ? '✓ gelernt' : s === 'unsicher' ? '? unsicher' : 'offen'}</button>`).join('') +
+      ['gelernt', 'unsicher', 'offen'].map(s => `<button type="button" data-s="${s}" class="${cur === s ? 'on' : ''}" aria-pressed="${cur === s}">${s}</button>`).join('') +
       `</div>`;
   }
   // Globale Delegation für Status-Gruppen
